@@ -1,0 +1,685 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Cheat Sheet (Species Example)},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Cheat Sheet (Species Example)}
+\author{}
+\date{\vspace{-2.5em}2024-07-02}
+
+\begin{document}
+\maketitle
+
+First load our data
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{data}\NormalTok{(gala, }\AttributeTok{package =}\StringTok{"faraway"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Then we create our linear model of our data with Species as the result
+and Elevation as the input
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{fit}\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{( Species }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Elevation, }\AttributeTok{data=}\NormalTok{gala)}
+\end{Highlighting}
+\end{Shaded}
+
+We can calculate our estimated \(\sigma^2\), equal to
+\(Var(y_i)=Var(\epsilon_i)\), using the sum of residuals, or difference
+of each y and its estimated value, divided by the degrees of freedom, n,
+minus 2 This estimation is unbiased for \(\sigma^2\). This calculation
+is essentially the same as doing
+\(\frac{1}{N-2}\sum_{i=1}^n\epsilon_i^2\). \(\hat{\sigma}\) = Residual
+Standard Error.
+
+We can also get the \(\sigma^2\) using summary(model)\$sigma\^{}2.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sigma2.hat }\OtherTok{\textless{}{-}} \FunctionTok{sum}\NormalTok{((fit}\SpecialCharTok{$}\NormalTok{residuals}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{))}\SpecialCharTok{/}\NormalTok{fit}\SpecialCharTok{$}\NormalTok{df.residual }
+\NormalTok{sigma2.hat }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 6187.638
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sigma.hat }\OtherTok{\textless{}{-}} \FunctionTok{sqrt}\NormalTok{(sigma2.hat)}
+\FunctionTok{summary}\NormalTok{(fit)}\SpecialCharTok{$}\NormalTok{sigma}\SpecialCharTok{\^{}}\DecValTok{2}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 6187.638
+\end{verbatim}
+
+We can estimate our \(\beta_1\) and \(\beta_0\) values using equations
+derived by setting derivatives of the SSR, sum of squared residuals, to
+zero with respect to both \(\beta_1\) and \(\beta_0\).
+
+\(\hat{\beta_1} = \frac{\sum_{i=1}^n(x_i-\bar{x})(y_i-\bar{y})}{\sum_{i=1}^n(x_i-\bar{x})^2}\)
+
+\(\hat{\beta_0} = \bar{y} - \hat{\beta_1}\bar{x}\)
+
+We can prove that each of these estimates are unbiased,
+\(E[\beta_i] = \beta_i\)
+
+We can also get these estimates by simply using coef(fit) or
+fit\$coefficients.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{x }\OtherTok{\textless{}{-}}\NormalTok{ gala}\SpecialCharTok{$}\NormalTok{Elevation}
+\NormalTok{y }\OtherTok{\textless{}{-}}\NormalTok{ gala}\SpecialCharTok{$}\NormalTok{Species}
+\NormalTok{n }\OtherTok{\textless{}{-}} \FunctionTok{length}\NormalTok{(y)}
+\NormalTok{beta1 }\OtherTok{\textless{}{-}} \FunctionTok{sum}\NormalTok{((y}\SpecialCharTok{{-}}\FunctionTok{mean}\NormalTok{(y))}\SpecialCharTok{*}\NormalTok{(x}\SpecialCharTok{{-}}\FunctionTok{mean}\NormalTok{(x)))}\SpecialCharTok{/}\FunctionTok{sum}\NormalTok{((x}\SpecialCharTok{{-}}\FunctionTok{mean}\NormalTok{(x))}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{) }
+\NormalTok{beta1 }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.2007922
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{beta0 }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(y)}\SpecialCharTok{{-}}\NormalTok{beta1}\SpecialCharTok{*}\FunctionTok{mean}\NormalTok{(x) }
+\NormalTok{beta0}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 11.33511
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{fit}\SpecialCharTok{$}\NormalTok{coefficients}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## (Intercept)   Elevation 
+##  11.3351132   0.2007922
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{coef}\NormalTok{(fit)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## (Intercept)   Elevation 
+##  11.3351132   0.2007922
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{SSR }\OtherTok{\textless{}{-}} \FunctionTok{sum}\NormalTok{((fit}\SpecialCharTok{$}\NormalTok{residuals)}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{)}
+\NormalTok{SSR}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 173253.9
+\end{verbatim}
+
+With these values we now can calculate our predictions for the y-values,
+\(\hat{y}\), using \(\hat{y_i}=\hat{\beta_0}+\hat{\beta_1}x_i\) for
+i=1,\ldots,n.~This can also be done using fitted(fit).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{y.hat }\OtherTok{\textless{}{-}}\NormalTok{ beta0}\SpecialCharTok{+}\NormalTok{beta1}\SpecialCharTok{*}\NormalTok{x}
+\NormalTok{y.hat}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  [1]  80.80921  33.22146  34.22542  20.57155  26.79611  35.22938  30.00879
+##  [8]  45.06820  25.59136  33.82384  51.09197 311.31865  21.17393  56.91494
+## [15]  26.59532 354.08739  80.20684  16.35492 167.35065 103.29794  30.20958
+## [22]  85.02585 155.10232 193.25284 184.81957  63.34029 139.84212  40.85157
+## [29]  48.68246  62.13554
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{fitted}\NormalTok{(fit)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##       Baltra    Bartolome     Caldwell     Champion      Coamano Daphne.Major 
+##     80.80921     33.22146     34.22542     20.57155     26.79611     35.22938 
+## Daphne.Minor       Darwin         Eden      Enderby     Espanola   Fernandina 
+##     30.00879     45.06820     25.59136     33.82384     51.09197    311.31865 
+##     Gardner1     Gardner2     Genovesa      Isabela     Marchena       Onslow 
+##     21.17393     56.91494     26.59532    354.08739     80.20684     16.35492 
+##        Pinta       Pinzon   Las.Plazas       Rabida SanCristobal  SanSalvador 
+##    167.35065    103.29794     30.20958     85.02585    155.10232    193.25284 
+##    SantaCruz      SantaFe   SantaMaria      Seymour      Tortuga         Wolf 
+##    184.81957     63.34029    139.84212     40.85157     48.68246     62.13554
+\end{verbatim}
+
+We can calculate the residuals, \(y_i-\hat{y}\) for i=1,\ldots,n, using
+fit\$residuals or residuals(fit). This is essentially the error for each
+y value, or the difference between our prediction and the actual value.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{fit}\SpecialCharTok{$}\NormalTok{residuals}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##       Baltra    Bartolome     Caldwell     Champion      Coamano Daphne.Major 
+##   -22.809212    -2.221462   -31.225423     4.428446   -24.796112   -17.229384 
+## Daphne.Minor       Darwin         Eden      Enderby     Espanola   Fernandina 
+##    -6.008787   -35.068202   -17.591359   -31.823839    45.908033  -218.318650 
+##     Gardner1     Gardner2     Genovesa      Isabela     Marchena       Onslow 
+##    36.826069   -51.914941    13.404680    -7.087387   -29.206835   -14.354918 
+##        Pinta       Pinzon   Las.Plazas       Rabida SanCristobal  SanSalvador 
+##   -63.350647     4.702062   -18.209579   -15.025848   124.897677    43.747160 
+##    SantaCruz      SantaFe   SantaMaria      Seymour      Tortuga         Wolf 
+##   259.180432    -1.340291   145.157883     3.148434   -32.682461   -41.135538
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{residuals}\NormalTok{(fit)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##       Baltra    Bartolome     Caldwell     Champion      Coamano Daphne.Major 
+##   -22.809212    -2.221462   -31.225423     4.428446   -24.796112   -17.229384 
+## Daphne.Minor       Darwin         Eden      Enderby     Espanola   Fernandina 
+##    -6.008787   -35.068202   -17.591359   -31.823839    45.908033  -218.318650 
+##     Gardner1     Gardner2     Genovesa      Isabela     Marchena       Onslow 
+##    36.826069   -51.914941    13.404680    -7.087387   -29.206835   -14.354918 
+##        Pinta       Pinzon   Las.Plazas       Rabida SanCristobal  SanSalvador 
+##   -63.350647     4.702062   -18.209579   -15.025848   124.897677    43.747160 
+##    SantaCruz      SantaFe   SantaMaria      Seymour      Tortuga         Wolf 
+##   259.180432    -1.340291   145.157883     3.148434   -32.682461   -41.135538
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{y}\SpecialCharTok{{-}}\NormalTok{y.hat}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  [1]  -22.809212   -2.221462  -31.225423    4.428446  -24.796112  -17.229384
+##  [7]   -6.008787  -35.068202  -17.591359  -31.823839   45.908033 -218.318650
+## [13]   36.826069  -51.914941   13.404680   -7.087387  -29.206835  -14.354918
+## [19]  -63.350647    4.702062  -18.209579  -15.025848  124.897677   43.747160
+## [25]  259.180432   -1.340291  145.157883    3.148434  -32.682461  -41.135538
+\end{verbatim}
+
+We can also estimate the standard error, \(\sqrt{Var()}\), of each
+\(\beta\) as well
+
+\(Var(\hat{\beta_0}) = \sigma^2[\frac{1}{n} + \frac{\bar{x}^2}{\sum_{i=1}^n(x_i-\bar{x})^2}]\)
+
+\(Var(\hat{\beta_1}) = \frac{\sigma^2}{\sum_{i=1}^n(x_i-\bar{x})^2}\)
+
+The variance estimates using the LS method are the smallest variance
+unbiased estimators of each \(\beta\)
+
+We can also find the standard error using summary(model)\$coef{[},2{]}
+or coef(summary(model)){[}, ``Std. Error''{]}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{se.beta1}\OtherTok{\textless{}{-}}\NormalTok{ sigma.hat}\SpecialCharTok{/}\FunctionTok{sqrt}\NormalTok{(}\FunctionTok{sum}\NormalTok{((x}\SpecialCharTok{{-}}\FunctionTok{mean}\NormalTok{(x))}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{))}
+\NormalTok{se.beta1}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.03464637
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{se.beta0}\OtherTok{\textless{}{-}}\NormalTok{ sigma.hat}\SpecialCharTok{*}\FunctionTok{sqrt}\NormalTok{((}\DecValTok{1}\SpecialCharTok{/}\NormalTok{n}\SpecialCharTok{+}\FunctionTok{mean}\NormalTok{(x)}\SpecialCharTok{\^{}}\DecValTok{2}\SpecialCharTok{/}\FunctionTok{sum}\NormalTok{((x}\SpecialCharTok{{-}}\FunctionTok{mean}\NormalTok{(x))}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{)))}
+\NormalTok{se.beta0}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 19.20529
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(fit)}\SpecialCharTok{$}\NormalTok{coef[,}\DecValTok{2}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## (Intercept)   Elevation 
+## 19.20528842  0.03464637
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{coef}\NormalTok{(}\FunctionTok{summary}\NormalTok{(fit))[, }\StringTok{"Std. Error"}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## (Intercept)   Elevation 
+## 19.20528842  0.03464637
+\end{verbatim}
+
+One way we can measure how good this fits our data is to calculate
+\(R^2\), the coefficient of determination. Values closer to 1 indicate a
+good fit and \(0 \leq R^2 \leq 1\)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{R}\FloatTok{.2} \OtherTok{\textless{}{-}} \DecValTok{1}\SpecialCharTok{{-}} \FunctionTok{sum}\NormalTok{((fit}\SpecialCharTok{$}\NormalTok{residuals)}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{ )}\SpecialCharTok{/}\NormalTok{(}\FunctionTok{sum}\NormalTok{((y}\SpecialCharTok{{-}}\FunctionTok{mean}\NormalTok{(y))}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{))}
+\NormalTok{R}\FloatTok{.2} 
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.5453625
+\end{verbatim}
+
+If we were to go through a hypothesis test to determine a likely
+interval for our \(\beta\) estimates, we can create a confidence
+interval using
+\(interval=(\hat{\beta_i} \pm t_{\alpha/2,N-2}SE(\hat{\beta_i}))\) for
+i=0,1, with SE being the standard error and alpha being 1-percentage of
+our confidence interval. So if we wanted a 95\% CI, we can use the qt()
+function to get the t-values and because it uses the upper-tail we will
+use \((1-95)/2=2.5\) and then do \(1-2.5=0.975\) to get our percentage
+value.
+
+We can also just use the confint(fit) function to get a 95\% CI by
+default or use level= to specify the interval.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{CI.beta0 }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(fit}\SpecialCharTok{$}\NormalTok{coefficients[}\DecValTok{1}\NormalTok{] }\SpecialCharTok{{-}} \FunctionTok{qt}\NormalTok{(}\FloatTok{0.975}\NormalTok{, }\AttributeTok{df=}\NormalTok{fit}\SpecialCharTok{$}\NormalTok{df.residual)}\SpecialCharTok{*}\NormalTok{se.beta0, fit}\SpecialCharTok{$}\NormalTok{coefficients[}\DecValTok{1}\NormalTok{] }\SpecialCharTok{+} \FunctionTok{qt}\NormalTok{(}\FloatTok{0.975}\NormalTok{, }\AttributeTok{df=}\NormalTok{fit}\SpecialCharTok{$}\NormalTok{df.residual)}\SpecialCharTok{*}\NormalTok{se.beta0) }
+\NormalTok{CI.beta0}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## (Intercept) (Intercept) 
+##   -28.00514    50.67536
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{CI.beta1}\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(fit}\SpecialCharTok{$}\NormalTok{coefficients[}\DecValTok{2}\NormalTok{] }\SpecialCharTok{{-}} \FunctionTok{qt}\NormalTok{(}\FloatTok{0.975}\NormalTok{, }\AttributeTok{df=}\NormalTok{fit}\SpecialCharTok{$}\NormalTok{df.residual)}\SpecialCharTok{*}\NormalTok{se.beta1,}
+\NormalTok{fit}\SpecialCharTok{$}\NormalTok{coefficients[}\DecValTok{2}\NormalTok{] }\SpecialCharTok{+} \FunctionTok{qt}\NormalTok{(}\FloatTok{0.975}\NormalTok{, }\AttributeTok{df=}\NormalTok{fit}\SpecialCharTok{$}\NormalTok{df.residual)}\SpecialCharTok{*}\NormalTok{se.beta1)}
+\NormalTok{CI.beta1}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Elevation Elevation 
+## 0.1298223 0.2717621
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{confint}\NormalTok{(fit)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                   2.5 %     97.5 %
+## (Intercept) -28.0051367 50.6753632
+## Elevation     0.1298223  0.2717621
+\end{verbatim}
+
+Our test-statistic \(T_k\) can be found using
+\(T_k=\frac{\hat{\beta_k}-b_{k,0}}{\sqrt{\hat{Var(\hat{\beta_k})}}}\) if
+we are testing with \(H_0:\beta_k=b_{k,0}\) and
+\(H_1:\beta_k \neq b_{k,0}\). We reject the null hypothesis if
+\(|T_k| \gt t_{1-\alpha/2,n-2}\).
+
+Suppose we wanted to estimate the average response conditioned on a
+predictor, \(E[y_k]=E[y_k|x_k]=\beta_0+\beta_1x_k\), a good estimate for
+this is \(\hat{E}[y_k]=\hat{y_k}=\hat{\beta_0}+\hat{\beta_1}x_k\). We
+know this is normal because \(\hat{\beta_0}\) and \(\hat{\beta_1}\) are
+both normal. Thus:
+
+\(E[\hat{y_k}]=E[\hat{\beta_0}+\hat{\beta_1}x_k]=\beta_0+\beta_1x_k=E[y_k]\)
+So, \(\hat{y_k}\) is an unbiased estimator for \(E[y_k]\).
+
+\(Var(\hat{y_k})=Var(\hat{\beta_0}+\hat{\beta_1}x_k)=Var(\bar{y}-\hat{\beta_1}\bar{x}+\hat{\beta_1}x_k)\)
+
+\(=Var(\bar{y}+\hat{\beta_1}(x_k-\bar{x}))=Var(\bar{y})+(x_k-\bar{x})^2Var(\hat{\beta_1})+2(x_k-\bar{x})Cov(\bar{y},\hat{\beta_1})\)
+
+\(=\frac{\sigma^2}{n}+\frac{(x_k-\bar{x})^2\sigma^2}{\sum_{i=1}^n(x_i-\bar{x})^2}=\sigma^2[\frac{1}{n}+\frac{(x_k-\bar{x})^2}{\sum_{i=1}^n(x_i-\bar{x})^2}]\)
+
+If we wanted to do a hypothesis test on this, our test-statistic would
+be
+\(T_k=\frac{\hat{y_k}-E[y_k]}{\sqrt{MSE[\frac{1}{n}+\frac{(x_k-\bar{x})^2}{\sum_{i=1}^n(x_i-\bar{x})^2}]}} \sim t_{n-2}\)
+
+A CI for this would be
+\((\hat{y_k} \pm t_{1-\alpha/2,n-2}\hat{SE}(\hat{y}))\) and we are
+\(1-\alpha\)\% confident that \(E[y_k]\) is within this.
+
+We can plot our predicted values with the actual values using
+plot(predicetd\textasciitilde input, data=, main=``Title'') and
+abline(fit, col=``Color'').
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{plot}\NormalTok{(Species}\SpecialCharTok{\textasciitilde{}}\NormalTok{Elevation , }\AttributeTok{data =}\NormalTok{ gala,}
+     \AttributeTok{main =} \StringTok{"Plot with fitted values"}\NormalTok{)}
+\FunctionTok{abline}\NormalTok{(fit, }\AttributeTok{col =} \StringTok{"Red"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Cheat_Sheet_files/figure-latex/unnamed-chunk-10-1.pdf}
+
+If we are dealing with a multiple linear regression model with multiple
+predictor variables, we coulds tack all the observations and obtain the
+following matrix representation:
+
+\[\begin{bmatrix}
+y_1\\
+\vdots\\
+y_n
+\end{bmatrix}
+=\begin{bmatrix}
+1 & x_{11} & \dots & x_{1p}\\
+\vdots & \vdots & \ddots & \vdots\\
+1 & x_{n1} & \dots & x_{np}
+\end{bmatrix}\begin{bmatrix}
+\beta_1\\
+\vdots\\
+\beta_p
+\end{bmatrix} + \begin{bmatrix}
+\epsilon_1\\
+\vdots\\
+\epsilon_n
+\end{bmatrix}\]
+
+\(y\sim N_n(X\beta,\sigma^2I_n)\) and
+\(\hat{\sigma}^2=\frac{\hat{\epsilon}^T\hat{\epsilon}}{n-p^*}=\frac{SSR}{n-p^*}\)
+for X being an \(n\;x\;p^*\) matrix.
+
+Our estimate for \(\hat{\sigma}^2=\frac{SSR}{n-p^*}\)
+
+We can easily find that \(E[\hat{\beta}]=\beta\) and
+\(Var(\hat{\beta})=(X^tX)^{-1}\sigma^2\) using the fact that
+\(\hat{\beta}=(X^TX)^{-1}X^Ty\)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{X }\OtherTok{\textless{}{-}} \FunctionTok{cbind}\NormalTok{(}\FunctionTok{rep}\NormalTok{(}\DecValTok{1}\NormalTok{,}\AttributeTok{times=}\FunctionTok{length}\NormalTok{(gala}\SpecialCharTok{$}\NormalTok{Area)), gala}\SpecialCharTok{$}\NormalTok{Area, gala}\SpecialCharTok{$}\NormalTok{Elevation, gala}\SpecialCharTok{$}\NormalTok{Scruz, gala}\SpecialCharTok{$}\NormalTok{Adjacent)}
+\FunctionTok{colnames}\NormalTok{(X) }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"Intecept"}\NormalTok{, }\StringTok{"Area"}\NormalTok{, }\StringTok{"Elevation"}\NormalTok{, }\StringTok{"Scruz"}\NormalTok{, }\StringTok{"Adjacent"}\NormalTok{)}
+\NormalTok{Beta.hat}\OtherTok{\textless{}{-}} \FunctionTok{solve}\NormalTok{(}\FunctionTok{crossprod}\NormalTok{(X))}\SpecialCharTok{\%*\%}\NormalTok{(}\FunctionTok{t}\NormalTok{(X)}\SpecialCharTok{\%*\%}\NormalTok{y)}
+\FunctionTok{t}\NormalTok{(Beta.hat)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      Intecept        Area Elevation      Scruz    Adjacent
+## [1,] 7.075377 -0.02397793 0.3195734 -0.2393552 -0.07484842
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{fit1 }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(Species }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Area }\SpecialCharTok{+}\NormalTok{ Elevation }\SpecialCharTok{+}\NormalTok{ Scruz }\SpecialCharTok{+}\NormalTok{ Adjacent, }\AttributeTok{data=}\NormalTok{gala)}
+\NormalTok{sigma.hat }\OtherTok{\textless{}{-}} \FunctionTok{sqrt}\NormalTok{(}\FunctionTok{sum}\NormalTok{(fit1}\SpecialCharTok{$}\NormalTok{residuals}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{)}\SpecialCharTok{/}\NormalTok{(fit1}\SpecialCharTok{$}\NormalTok{df.residual))}
+\NormalTok{sigma.hat}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 59.74333
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{XtX.inverse }\OtherTok{\textless{}{-}} \FunctionTok{solve}\NormalTok{(}\FunctionTok{crossprod}\NormalTok{(X))}
+\NormalTok{XtX.inverse}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                Intecept          Area     Elevation         Scruz      Adjacent
+## Intecept   9.849524e-02  3.879513e-05 -1.589754e-04 -4.059337e-04  2.421334e-05
+## Area       3.879513e-05  1.296222e-07 -2.439943e-07  1.163061e-07  4.003452e-08
+## Elevation -1.589754e-04 -2.439943e-07  7.323822e-07 -1.457015e-07 -1.471043e-07
+## Scruz     -4.059337e-04  1.163061e-07 -1.457015e-07  7.594187e-06 -1.368476e-08
+## Adjacent   2.421334e-05  4.003452e-08 -1.471043e-07 -1.368476e-08  7.747375e-08
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Beta.hat.SE }\OtherTok{\textless{}{-}}\NormalTok{ sigma.hat}\SpecialCharTok{*}\FunctionTok{sqrt}\NormalTok{(}\FunctionTok{diag}\NormalTok{(XtX.inverse))}
+\NormalTok{Beta.hat.SE}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Intecept        Area   Elevation       Scruz    Adjacent 
+## 18.74981844  0.02150944  0.05112795  0.16463800  0.01662902
+\end{verbatim}
+
+We also know that \(\hat{\epsilon}=M\epsilon\), so
+\(\frac{\hat{\epsilon}^T\hat{\epsilon}}{\sigma^2} \sim X^2(n-p^*)\)
+
+Our new \(R^2\) for the MLR becomes
+\(R^2=1-\frac{SSR}{SST}=1-\frac{y^TMy}{y^TM_1y}\) with
+\(M_1=(I-1(1^T1)^{-1}1^T)\)
+
+We can run hypothesis tests to determine if one model is better than
+another given two models \(M_1\) and \(M_2\) with \(M_2\) having more
+coefficients than \(M_1\). To test this we want to determine how similar
+the SSR is for each model, we would then pick the model with the
+smallest SSR if there is a significant difference. With
+\(H_0:SSR_{M_1}=SSR_{M_2}\) and \(H_1:SSR_{M_1}\gt SSR_{M_2}\)
+
+We can calculate our F-statistic
+\(F=\frac{(SSR_{M_1}-SSR_{M_2})/(df_{M_1}-df_{M_2})}{SSR_{M_2}/df_{M_2}} \sim F(df_{M_1}-df_{M_2},df_{M_2})\).
+
+One test we might want to do is the global F-test with
+\(H_0:\beta_1=...=\beta_p=0\) and \(H_1:\beta_j\neq 0\) for at least
+one. This essentially has the null hypothesis that the two models fit
+the data similarly well, and the alternative hypothesis that the full
+model fits the data better. We can find the SSR of each model to be:
+
+\(SSR_{M_0}=\sum_{i=1}^n(y_i-\bar{y})^2\) with \(df=n-1\) and
+\(SSR_{M_F}=\sum_{i=1}^n(y_i-\hat{y_i})^2\) with \(df=n-p^*\)
+\(SSR_{M_0}-SSR_{M_F}=\sum_{i=1}^n(\hat{y_i}-\bar{y})^2\) with
+\(df=p^*\)
+
+Given a significance level \(\alpha\), we reject the null hypothesis if
+\(F\gt F(1-\alpha;df_{M_1}-df_{M_2}, df_{M_2})\) or if
+\(p-value\lt \alpha\)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{fullmodel}\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{( Species }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Area}\SpecialCharTok{+}\NormalTok{Elevation}\SpecialCharTok{+}\NormalTok{ Scruz}\SpecialCharTok{+}\NormalTok{ Adjacent, }\AttributeTok{data=}\NormalTok{gala)}
+\NormalTok{nullmodel }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(Species}\SpecialCharTok{\textasciitilde{}}\DecValTok{1}\NormalTok{, }\AttributeTok{data=}\NormalTok{gala)}
+\NormalTok{anova1}\OtherTok{\textless{}{-}}\FunctionTok{anova}\NormalTok{(nullmodel, fullmodel)}
+\NormalTok{anova1}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Analysis of Variance Table
+## 
+## Model 1: Species ~ 1
+## Model 2: Species ~ Area + Elevation + Scruz + Adjacent
+##   Res.Df    RSS Df Sum of Sq      F   Pr(>F)    
+## 1     29 381081                                 
+## 2     25  89232  4    291850 20.442 1.39e-07 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{pval}\OtherTok{\textless{}{-}} \DecValTok{1}\SpecialCharTok{{-}}\FunctionTok{pf}\NormalTok{(anova1}\SpecialCharTok{$}\NormalTok{F[}\DecValTok{2}\NormalTok{],}\DecValTok{4}\NormalTok{,}\DecValTok{25}\NormalTok{)}
+\NormalTok{pval}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 1.389845e-07
+\end{verbatim}
+
+Another F-test we might want to do is to test for a pair of predictors
+and determine if having them in the model makes it more accurate. We
+would have \(H_0:\beta_l=\beta_k=0\) and
+\(H_1:\beta_l\neq0\;\&\;\beta_k\neq0\). \(M_1\) is the model with the
+two predictors and \(M_f\) contains them.
+
+\(SSR_{M_1}=y^T(I-H_1)y\) with \(df=n-p+1\) \(SSR_{M_F}=y^T(I-H_F)y\)
+with \(df=n-p-1\) \(SSR_{M_1}-SSR_{M_F}=y^T(H_F-H_1)y\) with \(df=2\)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{fullmodel}\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{( Species }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Area}\SpecialCharTok{+}\NormalTok{Elevation}\SpecialCharTok{+}\NormalTok{ Scruz}\SpecialCharTok{+}\NormalTok{ Adjacent, }\AttributeTok{data=}\NormalTok{gala)}
+\NormalTok{Model1 }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(Species}\SpecialCharTok{\textasciitilde{}}\NormalTok{Elevation}\SpecialCharTok{+}\NormalTok{ Adjacent, }\AttributeTok{data=}\NormalTok{gala)}
+\NormalTok{anova2}\OtherTok{\textless{}{-}}\FunctionTok{anova}\NormalTok{(Model1, fullmodel)}
+\NormalTok{anova2}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Analysis of Variance Table
+## 
+## Model 1: Species ~ Elevation + Adjacent
+## Model 2: Species ~ Area + Elevation + Scruz + Adjacent
+##   Res.Df    RSS Df Sum of Sq      F Pr(>F)
+## 1     27 100003                           
+## 2     25  89232  2     10771 1.5089 0.2406
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{pval}\OtherTok{\textless{}{-}} \DecValTok{1}\SpecialCharTok{{-}}\FunctionTok{pf}\NormalTok{(anova2}\SpecialCharTok{$}\NormalTok{F[}\DecValTok{2}\NormalTok{],}\DecValTok{2}\NormalTok{,}\DecValTok{25}\NormalTok{)}
+\NormalTok{pval}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.2406149
+\end{verbatim}
+
+\end{document}

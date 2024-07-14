@@ -1,0 +1,288 @@
+---
+
+---
+title: "Cheat Sheet (Species Example)"
+output:
+  html_document:
+    df_print: paged
+date: "2024-07-02"
+editor_options:
+  markdown:
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+First load our data
+
+```{r}
+data(gala, package ="faraway")
+```
+
+Then we create our linear model of our data with Species as the result
+and Elevation as the input
+
+```{r}
+fit<- lm( Species ~ Elevation, data=gala)
+```
+
+We can calculate our estimated $\sigma^2$, equal to
+$Var(y_i)=Var(\epsilon_i)$, using the sum of residuals, or difference of
+each y and its estimated value, divided by the degrees of freedom, n,
+minus 2 This estimation is unbiased for $\sigma^2$. This calculation is
+essentially the same as doing $\frac{1}{N-2}\sum_{i=1}^n\epsilon_i^2$.
+$\hat{\sigma}$ = Residual Standard Error.
+
+We can also get the $\sigma^2$ using summary(model)\$sigma\^2.
+
+```{r}
+sigma2.hat <- sum((fit$residuals^2))/fit$df.residual 
+sigma2.hat 
+sigma.hat <- sqrt(sigma2.hat)
+summary(fit)$sigma^2
+```
+
+We can estimate our $\beta_1$ and $\beta_0$ values using equations
+derived by setting derivatives of the SSR, sum of squared residuals, to
+zero with respect to both $\beta_1$ and $\beta_0$.
+
+$\hat{\beta_1} = \frac{\sum_{i=1}^n(x_i-\bar{x})(y_i-\bar{y})}{\sum_{i=1}^n(x_i-\bar{x})^2}$
+
+$\hat{\beta_0} = \bar{y} - \hat{\beta_1}\bar{x}$
+
+We can prove that each of these estimates are unbiased,
+$E[\beta_i] = \beta_i$
+
+We can also get these estimates by simply using coef(fit) or
+fit\$coefficients.
+
+```{r}
+x <- gala$Elevation
+y <- gala$Species
+n <- length(y)
+beta1 <- sum((y-mean(y))*(x-mean(x)))/sum((x-mean(x))^2) 
+beta1 
+beta0 <- mean(y)-beta1*mean(x) 
+beta0
+fit$coefficients
+coef(fit)
+SSR <- sum((fit$residuals)^2)
+SSR
+```
+
+With these values we now can calculate our predictions for the y-values,
+$\hat{y}$, using $\hat{y_i}=\hat{\beta_0}+\hat{\beta_1}x_i$ for
+i=1,...,n. This can also be done using fitted(fit).
+
+```{r}
+y.hat <- beta0+beta1*x
+y.hat
+fitted(fit)
+```
+
+We can calculate the residuals, $y_i-\hat{y}$ for i=1,...,n, using
+fit\$residuals or residuals(fit). This is essentially the error for each
+y value, or the difference between our prediction and the actual value.
+
+```{r}
+fit$residuals
+residuals(fit)
+y-y.hat
+```
+
+We can also estimate the standard error, $\sqrt{Var()}$, of each $\beta$
+as well
+
+$Var(\hat{\beta_0}) = \sigma^2[\frac{1}{n} + \frac{\bar{x}^2}{\sum_{i=1}^n(x_i-\bar{x})^2}]$
+
+$Var(\hat{\beta_1}) = \frac{\sigma^2}{\sum_{i=1}^n(x_i-\bar{x})^2}$
+
+The variance estimates using the LS method are the smallest variance
+unbiased estimators of each $\beta$
+
+We can also find the standard error using summary(model)\$coef[,2] or
+coef(summary(model))[, "Std. Error"].
+
+```{r}
+se.beta1<- sigma.hat/sqrt(sum((x-mean(x))^2))
+se.beta1
+se.beta0<- sigma.hat*sqrt((1/n+mean(x)^2/sum((x-mean(x))^2)))
+se.beta0
+summary(fit)$coef[,2]
+coef(summary(fit))[, "Std. Error"]
+```
+
+One way we can measure how good this fits our data is to calculate
+$R^2$, the coefficient of determination. Values closer to 1 indicate a
+good fit and $0 \leq R^2 \leq 1$
+
+```{r}
+R.2 <- 1- sum((fit$residuals)^2 )/(sum((y-mean(y))^2))
+R.2 
+```
+
+If we were to go through a hypothesis test to determine a likely
+interval for our $\beta$ estimates, we can create a confidence interval
+using $interval=(\hat{\beta_i} \pm t_{\alpha/2,N-2}SE(\hat{\beta_i}))$
+for i=0,1, with SE being the standard error and alpha being 1-percentage
+of our confidence interval. So if we wanted a 95% CI, we can use the
+qt() function to get the t-values and because it uses the upper-tail we
+will use $(1-95)/2=2.5$ and then do $1-2.5=0.975$ to get our percentage
+value.
+
+We can also just use the confint(fit) function to get a 95% CI by
+default or use level= to specify the interval.
+
+```{r}
+CI.beta0 <- c(fit$coefficients[1] - qt(0.975, df=fit$df.residual)*se.beta0, fit$coefficients[1] + qt(0.975, df=fit$df.residual)*se.beta0) 
+CI.beta0
+CI.beta1<- c(fit$coefficients[2] - qt(0.975, df=fit$df.residual)*se.beta1,
+fit$coefficients[2] + qt(0.975, df=fit$df.residual)*se.beta1)
+CI.beta1
+confint(fit)
+```
+
+Our test-statistic $T_k$ can be found using
+$T_k=\frac{\hat{\beta_k}-b_{k,0}}{\sqrt{\hat{Var(\hat{\beta_k})}}}$ if
+we are testing with $H_0:\beta_k=b_{k,0}$ and
+$H_1:\beta_k \neq b_{k,0}$. We reject the null hypothesis if
+$|T_k| \gt t_{1-\alpha/2,n-2}$.
+
+Suppose we wanted to estimate the average response conditioned on a
+predictor, $E[y_k]=E[y_k|x_k]=\beta_0+\beta_1x_k$, a good estimate for
+this is $\hat{E}[y_k]=\hat{y_k}=\hat{\beta_0}+\hat{\beta_1}x_k$. We know
+this is normal because $\hat{\beta_0}$ and $\hat{\beta_1}$ are both
+normal. Thus:
+
+$E[\hat{y_k}]=E[\hat{\beta_0}+\hat{\beta_1}x_k]=\beta_0+\beta_1x_k=E[y_k]$
+So, $\hat{y_k}$ is an unbiased estimator for $E[y_k]$.
+
+$Var(\hat{y_k})=Var(\hat{\beta_0}+\hat{\beta_1}x_k)=Var(\bar{y}-\hat{\beta_1}\bar{x}+\hat{\beta_1}x_k)$
+
+$=Var(\bar{y}+\hat{\beta_1}(x_k-\bar{x}))=Var(\bar{y})+(x_k-\bar{x})^2Var(\hat{\beta_1})+2(x_k-\bar{x})Cov(\bar{y},\hat{\beta_1})$
+
+$=\frac{\sigma^2}{n}+\frac{(x_k-\bar{x})^2\sigma^2}{\sum_{i=1}^n(x_i-\bar{x})^2}=\sigma^2[\frac{1}{n}+\frac{(x_k-\bar{x})^2}{\sum_{i=1}^n(x_i-\bar{x})^2}]$
+
+If we wanted to do a hypothesis test on this, our test-statistic would
+be
+$T_k=\frac{\hat{y_k}-E[y_k]}{\sqrt{MSE[\frac{1}{n}+\frac{(x_k-\bar{x})^2}{\sum_{i=1}^n(x_i-\bar{x})^2}]}} \sim t_{n-2}$
+
+A CI for this would be
+$(\hat{y_k} \pm t_{1-\alpha/2,n-2}\hat{SE}(\hat{y}))$ and we are
+$1-\alpha$% confident that $E[y_k]$ is within this.
+
+We can plot our predicted values with the actual values using
+plot(predicetd\~input, data=, main="Title") and abline(fit,
+col="Color").
+
+```{r}
+plot(Species~Elevation , data = gala,
+     main = "Plot with fitted values")
+abline(fit, col = "Red")
+```
+
+If we are dealing with a multiple linear regression model with multiple
+predictor variables, we coulds tack all the observations and obtain the
+following matrix representation:
+
+$$\begin{bmatrix}
+y_1\\
+\vdots\\
+y_n
+\end{bmatrix}
+=\begin{bmatrix}
+1 & x_{11} & \dots & x_{1p}\\
+\vdots & \vdots & \ddots & \vdots\\
+1 & x_{n1} & \dots & x_{np}
+\end{bmatrix}\begin{bmatrix}
+\beta_1\\
+\vdots\\
+\beta_p
+\end{bmatrix} + \begin{bmatrix}
+\epsilon_1\\
+\vdots\\
+\epsilon_n
+\end{bmatrix}$$
+
+$y\sim N_n(X\beta,\sigma^2I_n)$ and
+$\hat{\sigma}^2=\frac{\hat{\epsilon}^T\hat{\epsilon}}{n-p^*}=\frac{SSR}{n-p^*}$
+for X being an $n\;x\;p^*$ matrix.
+
+Our estimate for $\hat{\sigma}^2=\frac{SSR}{n-p^*}$
+
+We can easily find that $E[\hat{\beta}]=\beta$ and
+$Var(\hat{\beta})=(X^tX)^{-1}\sigma^2$ using the fact that
+$\hat{\beta}=(X^TX)^{-1}X^Ty$
+
+```{r}
+X <- cbind(rep(1,times=length(gala$Area)), gala$Area, gala$Elevation, gala$Scruz, gala$Adjacent)
+colnames(X) <- c("Intecept", "Area", "Elevation", "Scruz", "Adjacent")
+Beta.hat<- solve(crossprod(X))%*%(t(X)%*%y)
+t(Beta.hat)
+fit1 <- lm(Species ~ Area + Elevation + Scruz + Adjacent, data=gala)
+sigma.hat <- sqrt(sum(fit1$residuals^2)/(fit1$df.residual))
+sigma.hat
+XtX.inverse <- solve(crossprod(X))
+XtX.inverse
+Beta.hat.SE <- sigma.hat*sqrt(diag(XtX.inverse))
+Beta.hat.SE
+```
+
+We also know that $\hat{\epsilon}=M\epsilon$, so
+$\frac{\hat{\epsilon}^T\hat{\epsilon}}{\sigma^2} \sim X^2(n-p^*)$
+
+Our new $R^2$ for the MLR becomes
+$R^2=1-\frac{SSR}{SST}=1-\frac{y^TMy}{y^TM_1y}$ with
+$M_1=(I-1(1^T1)^{-1}1^T)$
+
+We can run hypothesis tests to determine if one model is better than
+another given two models $M_1$ and $M_2$ with $M_2$ having more
+coefficients than $M_1$. To test this we want to determine how similar
+the SSR is for each model, we would then pick the model with the
+smallest SSR if there is a significant difference. With
+$H_0:SSR_{M_1}=SSR_{M_2}$ and $H_1:SSR_{M_1}\gt SSR_{M_2}$
+
+We can calculate our F-statistic
+$F=\frac{(SSR_{M_1}-SSR_{M_2})/(df_{M_1}-df_{M_2})}{SSR_{M_2}/df_{M_2}} \sim F(df_{M_1}-df_{M_2},df_{M_2})$.
+
+One test we might want to do is the global F-test with
+$H_0:\beta_1=...=\beta_p=0$ and $H_1:\beta_j\neq 0$ for at least one.
+This essentially has the null hypothesis that the two models fit the
+data similarly well, and the alternative hypothesis that the full model
+fits the data better. We can find the SSR of each model to be:
+
+$SSR_{M_0}=\sum_{i=1}^n(y_i-\bar{y})^2$ with $df=n-1$ and
+$SSR_{M_F}=\sum_{i=1}^n(y_i-\hat{y_i})^2$ with $df=n-p^*$
+$SSR_{M_0}-SSR_{M_F}=\sum_{i=1}^n(\hat{y_i}-\bar{y})^2$ with $df=p^*$
+
+Given a significance level $\alpha$, we reject the null hypothesis if
+$F\gt F(1-\alpha;df_{M_1}-df_{M_2}, df_{M_2})$ or if $p-value\lt \alpha$
+
+```{r}
+fullmodel<- lm( Species ~ Area+Elevation+ Scruz+ Adjacent, data=gala)
+nullmodel <- lm(Species~1, data=gala)
+anova1<-anova(nullmodel, fullmodel)
+anova1
+pval<- 1-pf(anova1$F[2],4,25)
+pval
+```
+
+Another F-test we might want to do is to test for a pair of predictors
+and determine if having them in the model makes it more accurate. We
+would have $H_0:\beta_l=\beta_k=0$ and
+$H_1:\beta_l\neq0\;\&\;\beta_k\neq0$. $M_1$ is the model with the two
+predictors and $M_f$ contains them.
+
+$SSR_{M_1}=y^T(I-H_1)y$ with $df=n-p+1$ $SSR_{M_F}=y^T(I-H_F)y$ with
+$df=n-p-1$ $SSR_{M_1}-SSR_{M_F}=y^T(H_F-H_1)y$ with $df=2$
+
+```{r}
+fullmodel<- lm( Species ~ Area+Elevation+ Scruz+ Adjacent, data=gala)
+Model1 <- lm(Species~Elevation+ Adjacent, data=gala)
+anova2<-anova(Model1, fullmodel)
+anova2
+pval<- 1-pf(anova2$F[2],2,25)
+pval
+```

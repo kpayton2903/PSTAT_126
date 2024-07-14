@@ -1,0 +1,299 @@
+---
+title: "Homework 1"
+subtitle: PSTAT Summer 2024
+date: 'Due date: June, 2024'
+output:
+  html_document:
+    df_print: paged
+editor_options:
+  markdown:
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+1.  The dataset *trees* contains measurements of Girth (tree diameter)
+    in inches, Height in feet, and Volume of timber (in cubic feet) of a
+    sample of 31 felled black cherry trees. The following commands can
+    be used to read the data into R.
+
+```{r cereal}
+# the data set "trees" is contained in the R package "datasets"
+require(datasets)
+head(trees)
+```
+
+(a) (1pt) Briefly describe the data set trees, i.e., how many
+    observations (rows) and how many variables (columns) are there in
+    the data set? What are the variable names?
+
+    There are 31 total observations, or rows, and 3 total variables, or
+    columns. The variable names are Girth, Height, and Volume.
+
+(b) (2pts) Use the pairs function to construct a scatter plot matrix of
+    the logarithms of Girth, Height and Volume.
+
+```{r}
+pairs(~ log(Girth) + log(Height) + log(Volume), data=trees)
+```
+
+(c) (2pts) Use the cor function to determine the correlation matrix for
+    the three (logged) variables.
+
+```{r}
+cor(log(trees))
+```
+
+(d) (2pts) Are there missing values?
+
+    No, there are no missing values.
+
+(e) (2pts) Use the lm function in R to fit the multiple regression
+    model:
+    $$log(Volume_i) = \beta_0 + \beta_1 log(Girth_i) + \beta_2 log(Height_i) + \epsilon_i$$
+    and print out the summary of the model fit.
+
+```{r}
+fit <- lm(log(Volume) ~ log(Girth) + log(Height), data=trees)
+summary(fit)
+```
+
+(f) (3pts) Create the design matrix (i.e., the matrix of predictor
+    variables), X, for the model in (e), and verify that the least
+    squares coefficient estimates in the summary output are given by the
+    least squares formula: $\hat\beta = (X^TX)^{-1}X^Ty$.
+
+```{r}
+x <- cbind(rep(1, times=length(trees$Girth)), log(trees$Girth), log(trees$Height))
+y <- matrix(log(trees$Volume))
+beta.hat <- solve(t(x) %*% x) %*% t(x) %*% y
+beta.hat
+```
+
+(g) (3pts) Compute the predicted response values from the fitted
+    regression model, the residuals, and an estimate of the error
+    variance $Var(\epsilon) = \sigma^2$.
+
+```{r}
+predict(fit)
+fit$residuals
+sigma2 <- sum(fit$residuals^2)/fit$df.residual
+sigma2
+```
+
+<!-- -->
+
+2.  Consider the simple linear regression model:
+    $$y_i=\beta_0 + \beta_1x_i + \epsilon_i$$ **Part 1:** $\beta_0=0$
+
+<!-- -->
+
+(a) (3pts) Assume $\beta_0=0$. What is the interpretation of this
+    assumption? What is the implication on the regression line? What
+    does the regression line plot look like?
+
+    This means that there is no y-intercept for the regression line,
+    this implies that at x=0, y also is 0. This also means that if
+    $\beta_1$ is positive, the line will increase as x increases, and if
+    $\beta_1$ is negative, the line will decrease when x increases
+
+(b) (4pts) Derive the LS estimate of $\beta_1$ when $\beta_0=0$.
+
+    We can estimate each $\beta$ by minimizing the derivative of SSR
+    with respect to each $\beta$. So if we do this for $\beta_1$ with
+    $\beta_0=0$:
+
+    $SSR = \sum_{i=1}^{n}(y_i-\beta_1x_i)^2$
+
+    $\frac{\partial}{\partial \beta_1} SSR = \frac{\partial}{\partial \beta_1} \sum_{i=1}^n(y_i-\beta_1x_i)^2$
+
+    $\frac{\partial}{\partial \beta_1} SSR = \sum_{i=1}^n(-2y_ix_i+2\beta_1x_i^2)$
+
+    $0=\sum_{i=1}^n(-2y_ix_i+2\beta_1x_i^2)$
+
+    $\sum_{i=1}^ny_ix_i = \beta_1\sum_{i=1}^nx_i^2$
+
+    $\beta_1 = \frac{\sum_{i=1}^ny_ix_i}{\sum_{i=1}^nx_i^2}$
+
+    $\hat{\beta_1} = \frac{\sum_{i=1}^ny_ix_i}{\sum_{i=1}^nx_i^2}$
+
+(c) (3pts) How can we introduce this assumption within the lm function?\
+
+    To introduce this assumption to the lm function, we would use
+    lm(response \~ 0 + input) so that R the lm function knows to not use
+    an intercept.
+
+    \
+    **Part 2:** $\beta_1=0$\
+
+(d) (3pts) For the same model, assume $\beta_1=0$. What is the
+    interpretation of this assumption? What is the implication on the
+    regression line? What does the regression line plot look like?
+
+    This means the regression line has a y-intercept, but the line is
+    just straight and is not increasing or decreasing. This would imply
+    that our prediction for y at every value of x is the same.
+
+(e) (4pts) Derive the LS estimate of $\beta_0$ when $\beta_1=0$.
+
+    We can estimate each $\beta$ by minimizing the derivative of SSR
+    with respect to each $\beta$. So if we do this for $\beta_0$ with
+    $\beta_1=0$:
+
+    $SSR = \sum_{i=1}^{n}(y_i-\beta_0)^2$
+
+    $\frac{\partial}{\partial\beta_0} SSR  = \frac{\partial}{\partial\beta_0} \sum_{i=1}^n(yi-\beta_0)^2$
+
+    $\frac{\partial}{\partial\beta_0} SSR = \sum_{i=1}^n-2y_i+2\beta_0$
+
+    $0 = \sum_{i=1}^n-2y_i+2\beta_0$
+
+    $\sum_{i=1}^n y_i = \sum_{i=1}^n \beta_0$
+
+    $\beta_0 = \frac{1}{n}\sum_{i=1}^ny_i$
+
+    $\hat{\beta_0} = \bar{y}$
+
+(f) (3pts) How can we introduce this assumption within the lm function?
+
+    We can introduce this by doing lm(response\~1) to indicate that
+    $\beta_1=0$.
+
+<!-- -->
+
+3.  Consider the simple linear regression model:
+    $$y_i = \beta_0 + \beta_1x_i + \epsilon_i$$
+
+<!-- -->
+
+(a) (10pts) Use the LS estimation general result
+    $\hat\beta = (X^TX)^{-1}X^Ty$ to find the explicit estimates for
+    $\beta_0$ and $\beta_1$.
+
+    For n observations, the design matrix, X, and the response matrix, y
+    are:
+
+    $X = \begin{bmatrix}
+    1 & x_1\\
+    1 & x_2\\
+    \vdots & \vdots\\
+    1 & x_n
+    \end{bmatrix}$
+
+    $y = \begin{bmatrix}
+    y_1\\
+    y_2\\
+    \vdots\\
+    y_n
+    \end{bmatrix}$
+
+    First we will calculate $X^TX$:
+
+    $X^TX = \begin{bmatrix}
+    1 & 1 & \dots & 1\\
+    x_1 & x_2 & \dots & x_n
+    \end{bmatrix}\begin{bmatrix}
+    1 & x_1\\
+    1 & x_2\\
+    \vdots & \vdots\\
+    1 & x_n
+    \end{bmatrix}=
+    \begin{bmatrix}
+    n & \sum_{i=1}^nx_i\\
+    \sum_{i=1}^nx_i & \sum_{i=1}^nx_i^2
+    \end{bmatrix}$
+
+    Now I can compute $X^Ty$:
+
+    $X^Ty = \begin{bmatrix}
+    1 & 1 & \dots & 1\\
+    x_1 & x_2 & \dots & x_n
+    \end{bmatrix}\begin{bmatrix}
+    y_1\\
+    y_2\\
+    \vdots\\
+    y_n
+    \end{bmatrix} = \begin{bmatrix}
+    \sum_{i=1}^ny_i\\
+    \sum_{i=1}^nx_iy_i
+    \end{bmatrix}$
+
+    The inverse of $X^TX$ is:
+
+    $(X^TX)^{-1} =      \frac{1}{n\sum_{i=1}^nx_i^2-(\sum_{i=1}^nx_i)^2}\begin{bmatrix}
+    \sum_{i=1}^nx_i^2 & -\sum_{i=1}^nx_i\\
+    -\sum_{i=1}^nx_i & n
+    \end{bmatrix}$
+
+    Finally we can compute $\hat{\beta}$:
+
+    $\hat{\beta} = (X^TX)^{-1}X^Ty = \frac{1}{n\sum_{i=1}^nx_i^2-(\sum_{i=1}^nx_i)^2}\begin{bmatrix}
+    \sum_{i=1}^nx_i^2 & -\sum_{i=1}^nx_i\\
+    -\sum_{i=1}^nx_i & n
+    \end{bmatrix}\begin{bmatrix}
+    \sum_{i=1}^ny_i\\
+    \sum_{i=1}^nx_iy_i
+    \end{bmatrix}$
+
+    $\hat{\beta} = \frac{1}{n\sum_{i=1}^nx_i^2-(\sum_{i=1}^nx_i)^2}\begin{bmatrix}
+    \sum_{i=1}^nx_i^2\sum_{i=1}^ny_i-\sum_{i=1}^nx_i\sum_{i=1}^nx_iy_i\\
+    =\sum_{i=1}^nx_i\sum_{i=1}^ny_i+n\sum_{i=1}^nx_iy_i
+    \end{bmatrix}$
+
+    This gives us:
+
+    $\hat{\beta_0}=\frac{\sum_{i=1}^nx_i^2\sum_{i=1}^ny_i-\sum_{i=1}^nx_i\sum_{i=1}^nx_iy_i}{n\sum_{i=1}^nx_i^2-(\sum_{i=1}^nx_i)^2}$
+
+    $\hat{\beta_1}=\frac{n\sum_{i=1}^mx_iy_i-\sum_{i=1}^nx_i\sum_{i=1}^ny_i}{n\sum_{i=1}^nx_i^2-(\sum_{i=1}^nx_i)^2}$
+
+    These can finally be simplified to be:
+
+    $\hat{\beta_1} = \frac{\sum_{i=1}^n(x_i-\bar{x})(y_i-\bar{y})}{\sum_{i=1}^n(x_i-\bar{x})^2}$
+
+    $\hat{\beta_0} = \bar{y}-\hat{\beta_1}\bar{x}$
+
+(b) (5pts) Show that the LS estimates $\hat\beta_0$ and $\hat\beta_1$
+    are unbiased estimates for $\beta_0$ and $\beta_1$ respectively.
+
+    I will first show that $\hat{\beta_1}$ is unbiased:
+
+    $y_i=\beta_0+\beta_1x_i+\epsilon_i$
+
+    $\hat{\beta_1} = \frac{\sum_{i=1}^n(x_i-\bar{x})(y_i-\bar{y})}{\sum_{i=1}^n(x_i-\bar{x})^2} = \frac{\sum_{i=1}^n(x_i-\bar{x})(\beta_0+\beta_1x_i+\epsilon_i-\bar{y})}{\sum_{i=1}^n(x_i-\bar{x})^2}$
+
+    $\hat{\beta_1} = \frac{\sum_{i=1}^n(x_i-\bar{x})(\beta_0+\beta_1x_i+\epsilon_i-\beta_0-\beta_1\bar{x})}{\sum_{i=1}^n(x_i-\bar{x})^2}$
+
+    $=\frac{\sum_{i=1}^n(x_i-\bar{x})(\beta_1(x_i-\bar{x})+\epsilon_i)}{\sum_{i=1}^n(x_i-\bar{x})^2}$
+
+    $=\beta_1\frac{\sum_{i=1}^n(x_i-\bar{x})^2}{\sum_{i=1}^n(x_i-\bar{x})^2}+\frac{\sum_{i=1}^n(x_i-\bar{x})\epsilon_i}{\sum_{i=1}^n(x_i-\bar{x})^2}$
+
+    $=\beta_1+\frac{\sum_{i=1}^n(x_i-\bar{x})\epsilon_i}{\sum_{i=1}^n(x_i-\bar{x})^2}$
+
+    Because $E[\epsilon_i]=0$, it is east to see that
+    $E[\hat{\beta_1}]=\beta_1$ and thus it is unbiased.
+
+    Now for $\hat{\beta_0}$:
+
+    $\hat{\beta_0}=\bar{y}-\hat{\beta_1}-\bar{x}$
+
+    $E[\hat{\beta_0}]=E[\bar{y}-\hat{\beta_1}\bar{x}]$
+
+    $=E[\bar{y}]-E[\hat{\beta_1}\bar{x}]$
+
+    $=E[\bar{y}-\bar{x}E[\hat{\beta_1}]$
+
+    $=E[\bar{y}]-\bar{x}\beta_1$
+
+    $=E[\frac{1}{n}\sum_{i=1}^ny_i]-\bar{x}\beta_1$
+
+    $=E[\frac{1}{n}\sum_{i=1}^n(\beta_0+\beta_1x_i+\epsilon_i)]-\bar{x}\beta_1$
+
+    $=E[\beta_0+\beta_1\bar{x}+\frac{1}{n}\sum_{i=1}^n(\epsilon_i)]-\bar{x}\beta_1$
+
+    $=\beta_0+\beta_1\bar{x}-\bar{x}\beta_1$
+
+    $=\beta_0$
+
+    Thus, $\hat{\beta_0$ is also unbiased.
