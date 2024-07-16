@@ -1,12 +1,15 @@
 ---
 title: "Homework 2"
-subtitle: "PSTAT Summer 2024"
-output: pdf_document
-date: "Due date: July 15th, 2024 at 23:59 PT"
+subtitle: PSTAT Summer 2024
+date: 'Due date: July 15th, 2024 at 23:59 PT'
+output:
+  html_document:
+    df_print: paged
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(glue)
 ```
 
 1.  This question uses the *cereal* data set available in the Homework Assignment 2 on Canvas. The following command can be used to read the data into R. Make sure the "cereal.txt" file is in the same folder as your R/Rmd file.
@@ -33,41 +36,106 @@ The data set *cereal* contains measurements for a set of $77$ cereal brands. For
 -   Vitamins: Amount of vitamins.
 -   Cups: Portion size in cups.
 
-Our goal is to study how *rating* is related to all other 8 variables.\
-\
-(a) (4pts) Explore the data and perform a descriptive analysis of each variable, include any plot/statistics that you find relevant (histograms, scatter diagrams, correlation coefficients). Did you find any outlier? If yes, is it reasonable to remove this observation? why?\
+Our goal is to study how *rating* is related to all other 8 variables.
+
+(a) (4pts) Explore the data and perform a descriptive analysis of each variable, include any plot/statistics that you find relevant (histograms, scatter diagrams, correlation coefficients). Did you find any outlier? If yes, is it reasonable to remove this observation? why?
 
 ```{r}
-plot(rating~-protein, data=Cereal, main="Rating vs Protein")
-plot(rating~-fat, data=Cereal, main="Rating vs Fat")
-plot(rating~-fiber, data=Cereal, main="Rating vs Fiber")
-plot(rating~-carbo, data=Cereal, main="Rating vs Carbohydrates")
-plot(rating~-sugars, data=Cereal, main="Rating vs Sugar")
-plot(rating~-potass, data=Cereal, main="Rating vs Potassium")
-plot(rating~-vitamins, data=Cereal, main="Rating vs Vitamins")
-plot(rating~-cups, data=Cereal, main="Rating vs Cups")
+variables <- c("protein","fat","fiber","carbo","sugars","potass","vitamins","cups")
+for(x in variables) {
+  plot(rating~Cereal[,x], data=Cereal, main=glue("Rating vs    {x}"), xlab=x, cex=0.75)
+  abline(lm(rating~Cereal[,x], data=Cereal), col="Blue")
+}
+for(x in variables) {
+  hist(Cereal[,x], main=glue("{x}"))
+}
+r1 <- rstandard(model)
+observation <- 1
+for(x in r1) {
+  if(abs(x)>3 || abs(x)==3){
+    print(glue("Observation number {observation} is an outlier with a standardized residual value {x}"))
+  }
+  observation <- observation + 1
+}
 ```
 
-(b) (3pts) Use the lm function in R to fit the MLR model with *rating* as the response and the other $8$ variables as predictors. Display the summary output.\
+It is not reasonable to remove this outlier because its standardized residual is very close to 3.
+
+(b) (3pts) Use the lm function in R to fit the MLR model with *rating* as the response and the other $8$ variables as predictors. Display the summary output.
 
 ```{r}
 model <- lm(rating~protein+fat+fiber+carbo+sugars+potass+vitamins+cups, data= Cereal)
 summary(model)
 ```
 
-(c)(3pts) Which predictor variables are statistically significant under the significance threshold value of 0.01?\
-\
-(d)(2pts) What proportion of the total variation in the response is explained by the predictors?\
-\
-(e)(3pts) What is the null hypothesis of the global F-test? What is the p-value for the global F-test? Do the 7 predictor variables explain a significant proportion of the variation in the response?\
-\
-(f)(2pts) Consider testing the null hypothesis $H_0: \beta_{carbo} = 0$, where $\beta_{carbo}$ is the coefficient corresponding to *carbohydrates* in the MLR model. Use the t value available in the summary output to compute the p-value associated with this test, and verify that the p-value you get is identical to the p-value provided in the summary output.\
-\
-(g)(4pts)Suppose we are interested in knowing if either *vitamins* or *potass* had any relation to the response *rating*. What would be the corresponding null hypothesis of this statistical test? Construct a F-test, report the corresponding p-value, and your conclusion.\
-\
-(h)(3pts) Use the summary output to construct a 99% confidence interval for $\beta_{protein}$. What is the interpretation of this confidence interval?\
-\
-(i)(3pts) What is the predicted *rating* for a cereal brand with the following information:\
+(c)(3pts) Which predictor variables are statistically significant under the significance threshold value of 0.01?
+
+We can find the p-values in the fourth column of our coefficients matrix in the summary of the model. If the p-values are below our significance threshold of 0.01, they are statistically significant.
+
+```{r}
+p_values <- summary(model)$coefficients[, 4]
+significant_predictors <- names(p_values)[p_values < 0.01]
+significant_predictors
+```
+
+(d)(2pts) What proportion of the total variation in the response is explained by the predictors?
+
+This is simply just the $R^2$ value for the full model.
+
+```{r}
+R2 <- summary(model)$r.squared
+R2
+```
+
+(e)(3pts) What is the null hypothesis of the global F-test? What is the p-value for the global F-test? Do the 7 predictor variables explain a significant proportion of the variation in the response?
+
+The null hypothesis is: $H_0: \beta_1=...=\beta_8=0$.
+
+```{r}
+anova_test <- anova(lm(rating~1, data=Cereal), model)
+pval <- pf(anova_test$F[2], anova_test$Df[2], anova_test$Res.Df[2], lower.tail=FALSE)
+pval
+```
+
+Because our p-value is less than our significance level, $1.6234*10^{-31} < .01$, the predictor variables do indeed explain a significant proportion of the variation in the response.
+
+(f)(2pts) Consider testing the null hypothesis $H_0: \beta_{carbo} = 0$, where $\beta_{carbo}$ is the coefficient corresponding to *carbohydrates* in the MLR model. Use the t value available in the summary output to compute the p-value associated with this test, and verify that the p-value you get is identical to the p-value provided in the summary output.
+
+```{r}
+new_model <- lm(rating~protein+fat+fiber+sugars+potass+vitamins+cups, data=Cereal)
+anova_test2 <- anova(new_model, model)
+pval2 <- pf(anova_test2$F[2], anova_test2$Df[2], anova_test2$Res.Df[2], lower.tail=FALSE)
+pval2
+summary(model)$coefficients[5,4]
+```
+
+They are indeed equal.
+
+(g)(4pts)Suppose we are interested in knowing if either *vitamins* or *potass* had any relation to the response *rating*. What would be the corresponding null hypothesis of this statistical test? Construct a F-test, report the corresponding p-value, and your conclusion.
+
+To test this, we would perform an F-test for a pair of predictors with the following hypotheses: $H_0:\beta_{vitamins}=\beta_{potass}=0$ and $H_1:\beta_{vitamins}\neq 0 \; or \;\beta_{potass}\neq 0$
+
+```{r}
+new_model2 <- lm(rating~protein+fat+fiber+carbo+sugars+cups, data=Cereal)
+anova_test3 <- anova(new_model2, model)
+pval3 <- pf(anova_test3$F[2], anova_test3$Df[2], anova_test3$Res.Df[2], lower.tail=FALSE)
+pval3
+```
+
+Because this value is less than .01, we reject our null hypothesis and conclude that we are confident that at least one of the two, between vitamins and potass, have a relation to the response rating. I.E. at least one $\beta_i\neq 0$ for $i=vitamins,potass$.
+
+(h)(3pts) Use the summary output to construct a 99% confidence interval for $\beta_{protein}$. What is the interpretation of this confidence interval?
+
+```{r}
+confint(model, level=0.99)[2,]
+tval <- qt(1-.005,68)
+CI <- c(summary(model)$coefficients[2,1]-tval*summary(model)$coefficients[2,2],summary(model)$coefficients[2,1]+tval*summary(model)$coefficients[2,2])
+CI
+```
+
+We can construct the confidence interval using both the methods used above. This interval means that we are 99% confident that the actual value of $\beta_{protein}$ is within the interval.
+
+(i)(3pts) What is the predicted *rating* for a cereal brand with the following information:
 
 -   Protein=3
 -   Fat=5
@@ -78,6 +146,37 @@ summary(model)
 -   Vitamins=25
 -   Cups=0.8
 
-(j). (3pts) What is the 95% prediction interval for the observation in part (i)? What is the interpretation of this prediction interval?\
+```{r}
+x0 <- data.frame(protein=3,fat=5,fiber=2,carbo=13,sugars=6,potass=60,vitamins=25,cups=0.8)
+predict(model, newdata=x0)
+```
+
+(j). (3pts) What is the 95% prediction interval for the observation in part (i)? What is the interpretation of this prediction interval?
+
+```{r}
+predict(model, newdata=x0, interval="prediction", level=0.95)
+```
+
+We can interpret this interval to mean that we are 95% confident that the true value for y, with the information above, will fall between the given interval.
 
 Q2.(20pts) Consider the MLR model with $p$ predictors: $$\mathbf{y}=\mathbf{X}\boldsymbol \beta+\boldsymbol\epsilon, \qquad \boldsymbol \epsilon \sim N_n(\boldsymbol 0,\sigma^2\boldsymbol I_n)$$ If we define $\hat\sigma^2=\frac{SSR}{n-p^*}$, with $p^*=p+1$. Use theoretical results from the lectures to show that $\hat\sigma^2$ is an unbiased estimator of $\sigma^2$. Find $V(\hat\sigma^2)$.
+
+We can first rewrite SSR as $\epsilon^T\epsilon$
+
+$\epsilon^T\epsilon=My^T*My=M(X\beta+\epsilon)^T*M(X\beta+\epsilon)=\epsilon^TM\epsilon$
+
+$=\epsilon^T(I_n-H)\epsilon$
+
+Now we can find the expectation of this:
+
+$E[\epsilon^T(I_n-H)\epsilon]=\sigma^2tr(I_n-H)=\sigma^2(n-p-1)$
+
+This is because if we have a RV z\~N(0,A), we know $E[z^TBz]=tr(BA)+E[z]^TBE[z]$.
+
+Thus, $E[\hat{\sigma}^2]=E[\frac{SSR}{n-p-1}]=\frac{1}{n-p-1}E[SSR]=\frac{1}{n-p-1}\sigma^2(n-p-1)=\sigma^2$
+
+Now for the $Var(\hat{\sigma}^2)$, we know that $\frac{SSR}{\sigma^2}\sim X^2_{n-p-1}$
+
+So, $\hat{\sigma}^2\sim \frac{\sigma^2X^2_{n-p-1}}{n-p-1}$
+
+$Var(\hat{\sigma}^2)=Var(\frac{\sigma^2X^2_{n-p-1}}{n-p-1})=\frac{\sigma^4}{(n-p-1)^2}Var(X^2_{n-p-1})=\frac{\sigma^4}{(n-p-1)^2}*2(n-p-1)=\frac{2\sigma^4}{n-p-1}$
