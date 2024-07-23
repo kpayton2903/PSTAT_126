@@ -184,7 +184,7 @@ abline(fit, col = "Red")
 ```
 
 If we are dealing with a multiple linear regression model with multiple
-predictor variables, we coulds tack all the observations and obtain the
+predictor variables, we could stack all the observations and obtain the
 following matrix representation:
 
 $$\begin{bmatrix}
@@ -286,3 +286,160 @@ anova2
 pval<- 1-pf(anova2$F[2],2,25)
 pval
 ```
+
+For our MLR model we could also create a confidence interval for each $\hat{\beta_i}$ using the same method as before. $CI=\hat{\beta_j}\pm t_{(1-\alpha/2;n-p^*)}SE(\hat{\beta_j})$ Where $SE=\hat{\sigma}\sqrt{(X^TX)^{-1}_{jj}}$. If we wanted to test the null hypothesis $H_0:\beta_j=0$, we would fail to reject it if the CI contains zero. Both methods below achieve the same result.
+
+```{r}
+fit1 <- lm(Species ~ Area + Elevation + Nearest + Scruz + Adjacent, data=gala)
+CIs <- cbind(summary(fit1)$coefficients[, 1]-qt(0.975, fit$df.residual)*summary(fit1)$coefficients[, 2],summary(fit1)$coefficients[, 1]+qt(0.975, fit$df.residual)*summary(fit1)$coefficients[, 2])
+CIs
+confint(fit1)
+```
+
+When making CIs for predictions, there are typically two types of predictions being made in regression, prediction of response mean for a subject with characteristics $x_0$, and prediction of a future response of a new observation with characteristics $x_0$. A CI for the response mean is: $\hat{y_0}\pm t_{(t-\alpha/2;n-p^*)}\hat{\sigma}\sqrt{x_0^T(X^TX)^{-1}x_0}$. We can use either method below, the first calculates each value using the math, while the other method uses a built in function.
+
+```{r}
+x0 <- data.frame(Area=20.6, Elevation= 46, Nearest=1.9, Scruz=8.0, Adjacent=0.78)
+x0.vector <- cbind(c(1, 20.6,46,1.9,8.0,0.78))
+rownames(x0.vector) <- c("(Intercept)", "Area", "Elevation", "Nearest", "Scruz", "Adjacent")
+pred.y0 <- t(x0.vector)%*%fit1$coefficients
+pred.y0
+
+X <- cbind(rep(1,times=length(gala$Area)), gala$Area, gala$Elevation, gala$Nearest, gala$Scruz, gala$Adjacent)
+se2.betas<- t(x0.vector)%*%(solve(t(X)%*%X))%*%x0.vector
+sigma<- sigma(fit1)
+predmean.CI<- c(pred.y0 - sigma*qt(0.975,fit1$df.residual)*sqrt(se2.betas),
+pred.y0 + sigma* qt(0.975,fit1$df.residual)*sqrt(se2.betas))
+predmean.CI
+
+predict(fit1, newdata= x0, interval="confidence")
+```
+
+A CI for a single future observation is: $\hat{y_0}\pm t_{(1-\alpha/2;n-p^*)}\hat{\sigma}\sqrt{1+x_0^T(X^TX)^{-1}x_0}$. We can once again use either method below.
+
+```{r}
+pred.CI<- c(pred.y0 - sigma*qt(0.975,fit1$df.residual)*sqrt(1+se2.betas),
+pred.y0 + sigma* qt(0.975,fit1$df.residual)*sqrt(1+se2.betas))
+pred.CI
+
+predict(fit1, newdata=x0, interval="prediction")
+```
+
+If we wanted to check Homoscedasticity of our model, i.e. plotting the Residuals (vertical axis) vs the fitted values $\hat{y}$ (horizontal axis) we would do the following:
+
+```{r}
+par(mar = c(5, 5, 1, 10))
+plot(fitted(fit1), residuals(fit1), xlab="",ylab="", col="blue", pch=18);mtext(side=2, text="Residuals", line=2)
+```
+
+We could also check the normality of our model:
+
+```{r}
+par(mar = c(5, 5, 1, 10))
+qqnorm(residuals(fit1), ylab="Residuals",main="", pch=18, col="red")
+qqline(residuals(fit1))
+title("Residuals vs Theoretical Quantiles", cex.main=0.5)
+```
+
+Or we could run a Shapiro test with null hypothesis $H_0:$Residuals Are Normal:
+
+```{r}
+shapiro.test(residuals(fit1))
+```
+
+To check the correlation between our errors, we could plot time or space vs our residuals, and we would expect a random scatter of points above and below $\hat{\epsilon}=0$:
+
+```{r}
+par(mar = c(5, 5, 1, 10))
+plot(1:length(gala$Species), residuals(fit1), col="darkgreen", pch=18)
+abline(h=0. ,col="red")
+title("Residuals vs Time order", cex.main=0.5)
+```
+
+We could also run a Durvin-Watson test:
+
+```{r}
+dwtest(fit1)
+```
+
+If we wanted to calculate the leverage score for every value, or the weighted distance between $X_i$ and the average point of the $X_i 's$. We also know that $\sum_{i=1}^nh_i=p^*=p+1$
+
+```{r}
+library(faraway)
+data(savings)
+lmod<- lm(sr ~ pop15 + pop75+ dpi+ ddpi, savings)
+X<- model.matrix(lmod)
+hatv <- diag(X%*%(solve(t(X)%*%X))%*%t(X))
+hatv2<- hatvalues(lmod)
+all.equal(hatv, hatv2)
+
+sum(hatv2)
+```
+
+We can plot these leverage scores to determine which ones might have a very large influence on our model. Anything larger than $2\bar{h}$ is considered a large leverage score.
+
+```{r}
+data.lev<- data.frame(index=seq(length(hatv)),
+Leverage=hatv, namesC=rownames(savings))
+par(mar = c(4, 4, 0.5, 0.5))
+plot(Leverage ~ index, data=data.lev, col="white", pch=NULL)
+text(Leverage ~ index, labels=namesC, data=data.lev, cex=0.4, font=2, col="purple")
+abline(h = sum(hatv2)/dim(data.lev)[1], col="blue")
+abline(h = 2*sum(hatv2)/dim(data.lev)[1], col="orange", lty=2)
+abline(h = 3*sum(hatv2)/dim(data.lev)[1], col="red", lty=2)
+```
+
+If we wanted to determine outliers in our data, we can calculate standardized residuals: $r_i=\frac{y_i-\bar{y}_i}{\hat{\sigma}\sqrt{1-h_i}}$. Any $|r_i|\geq 3$ is an outlier.
+
+```{r}
+r1<- residuals(lmod)/(sigma(lmod)*sqrt(1-hatv))
+r2<- rstandard(lmod)
+all.equal(r1,r2)
+
+data.sres<- data.frame(index=seq(length(r2)),
+stdres=abs(r2), namesC=rownames(savings))
+par(mar = c(4, 4, 0.5, 5))
+plot(stdres ~ index, data=data.sres, col="white", pch=NULL)
+text(stdres ~ index, labels=namesC, data=data.sres, cex=0.4, font=2, col="purple")
+abline(h=3, col="red", lty=2)
+```
+
+We can calculate cook's distance to determine influential observations, or points that when removed would cause significant change in the model. $D_i=\frac{(\hat{y}-\hat{y}_{(i)})^T(\hat{y}-\hat{y}_{(i)})}{p^*\hat{\sigma}^2}=\frac{1}{p^*}r_i^2\frac{h_i}{1-h_i}$
+
+```{r}
+cook1<- (r1^2/dim(X)[2])* hatv/(1-hatv)
+cook2<- cooks.distance(lmod)
+all.equal(cook1,cook2)
+
+data.cook<- data.frame(index=seq(length(r2)),
+cookd=abs(cook2), namesC=rownames(savings))
+par(mar = c(4, 4, 0.5, 0.5))
+plot(cookd ~ index, data=data.cook, col="white", pch=NULL)
+text(cookd ~ index, labels=namesC, data=data.cook, cex=0.4, font=2, col="purple")
+abline(h=4/dim(X)[1], col="red", lty=2)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
