@@ -13,6 +13,9 @@ editor_options:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(lmtest)
+library(MASS)
+library(faraway)
 ```
 
 First load our data
@@ -287,7 +290,12 @@ pval<- 1-pf(anova2$F[2],2,25)
 pval
 ```
 
-For our MLR model we could also create a confidence interval for each $\hat{\beta_i}$ using the same method as before. $CI=\hat{\beta_j}\pm t_{(1-\alpha/2;n-p^*)}SE(\hat{\beta_j})$ Where $SE=\hat{\sigma}\sqrt{(X^TX)^{-1}_{jj}}$. If we wanted to test the null hypothesis $H_0:\beta_j=0$, we would fail to reject it if the CI contains zero. Both methods below achieve the same result.
+For our MLR model we could also create a confidence interval for each
+$\hat{\beta_i}$ using the same method as before.
+$CI=\hat{\beta_j}\pm t_{(1-\alpha/2;n-p^*)}SE(\hat{\beta_j})$ Where
+$SE=\hat{\sigma}\sqrt{(X^TX)^{-1}_{jj}}$. If we wanted to test the null
+hypothesis $H_0:\beta_j=0$, we would fail to reject it if the CI
+contains zero. Both methods below achieve the same result.
 
 ```{r}
 fit1 <- lm(Species ~ Area + Elevation + Nearest + Scruz + Adjacent, data=gala)
@@ -296,7 +304,14 @@ CIs
 confint(fit1)
 ```
 
-When making CIs for predictions, there are typically two types of predictions being made in regression, prediction of response mean for a subject with characteristics $x_0$, and prediction of a future response of a new observation with characteristics $x_0$. A CI for the response mean is: $\hat{y_0}\pm t_{(t-\alpha/2;n-p^*)}\hat{\sigma}\sqrt{x_0^T(X^TX)^{-1}x_0}$. We can use either method below, the first calculates each value using the math, while the other method uses a built in function.
+When making CIs for predictions, there are typically two types of
+predictions being made in regression, prediction of response mean for a
+subject with characteristics $x_0$, and prediction of a future response
+of a new observation with characteristics $x_0$. A CI for the response
+mean is:
+$\hat{y_0}\pm t_{(t-\alpha/2;n-p^*)}\hat{\sigma}\sqrt{x_0^T(X^TX)^{-1}x_0}$.
+We can use either method below, the first calculates each value using
+the math, while the other method uses a built in function.
 
 ```{r}
 x0 <- data.frame(Area=20.6, Elevation= 46, Nearest=1.9, Scruz=8.0, Adjacent=0.78)
@@ -315,7 +330,9 @@ predmean.CI
 predict(fit1, newdata= x0, interval="confidence")
 ```
 
-A CI for a single future observation is: $\hat{y_0}\pm t_{(1-\alpha/2;n-p^*)}\hat{\sigma}\sqrt{1+x_0^T(X^TX)^{-1}x_0}$. We can once again use either method below.
+A CI for a single future observation is:
+$\hat{y_0}\pm t_{(1-\alpha/2;n-p^*)}\hat{\sigma}\sqrt{1+x_0^T(X^TX)^{-1}x_0}$.
+We can once again use either method below.
 
 ```{r}
 pred.CI<- c(pred.y0 - sigma*qt(0.975,fit1$df.residual)*sqrt(1+se2.betas),
@@ -325,7 +342,9 @@ pred.CI
 predict(fit1, newdata=x0, interval="prediction")
 ```
 
-If we wanted to check Homoscedasticity of our model, i.e. plotting the Residuals (vertical axis) vs the fitted values $\hat{y}$ (horizontal axis) we would do the following:
+If we wanted to check Homoscedasticity of our model, i.e. plotting the
+Residuals (vertical axis) vs the fitted values $\hat{y}$ (horizontal
+axis) we would do the following:
 
 ```{r}
 par(mar = c(5, 5, 1, 10))
@@ -341,13 +360,16 @@ qqline(residuals(fit1))
 title("Residuals vs Theoretical Quantiles", cex.main=0.5)
 ```
 
-Or we could run a Shapiro test with null hypothesis $H_0:$Residuals Are Normal:
+Or we could run a Shapiro test with null hypothesis $H_0:$Residuals Are
+Normal:
 
 ```{r}
 shapiro.test(residuals(fit1))
 ```
 
-To check the correlation between our errors, we could plot time or space vs our residuals, and we would expect a random scatter of points above and below $\hat{\epsilon}=0$:
+To check the correlation between our errors, we could plot time or space
+vs our residuals, and we would expect a random scatter of points above
+and below $\hat{\epsilon}=0$:
 
 ```{r}
 par(mar = c(5, 5, 1, 10))
@@ -362,7 +384,9 @@ We could also run a Durvin-Watson test:
 dwtest(fit1)
 ```
 
-If we wanted to calculate the leverage score for every value, or the weighted distance between $X_i$ and the average point of the $X_i 's$. We also know that $\sum_{i=1}^nh_i=p^*=p+1$
+If we wanted to calculate the leverage score for every value, or the
+weighted distance between $X_i$ and the average point of the $X_i 's$.
+We also know that $\sum_{i=1}^nh_i=p^*=p+1$
 
 ```{r}
 library(faraway)
@@ -376,7 +400,9 @@ all.equal(hatv, hatv2)
 sum(hatv2)
 ```
 
-We can plot these leverage scores to determine which ones might have a very large influence on our model. Anything larger than $2\bar{h}$ is considered a large leverage score.
+We can plot these leverage scores to determine which ones might have a
+very large influence on our model. Anything larger than $2\bar{h}$ is
+considered a large leverage score.
 
 ```{r}
 data.lev<- data.frame(index=seq(length(hatv)),
@@ -389,7 +415,10 @@ abline(h = 2*sum(hatv2)/dim(data.lev)[1], col="orange", lty=2)
 abline(h = 3*sum(hatv2)/dim(data.lev)[1], col="red", lty=2)
 ```
 
-If we wanted to determine outliers in our data, we can calculate standardized residuals: $r_i=\frac{y_i-\bar{y}_i}{\hat{\sigma}\sqrt{1-h_i}}$. Any $|r_i|\geq 3$ is an outlier.
+If we wanted to determine outliers in our data, we can calculate
+standardized residuals:
+$r_i=\frac{y_i-\bar{y}_i}{\hat{\sigma}\sqrt{1-h_i}}$. Any $|r_i|\geq 3$
+is an outlier.
 
 ```{r}
 r1<- residuals(lmod)/(sigma(lmod)*sqrt(1-hatv))
@@ -404,7 +433,9 @@ text(stdres ~ index, labels=namesC, data=data.sres, cex=0.4, font=2, col="purple
 abline(h=3, col="red", lty=2)
 ```
 
-We can calculate cook's distance to determine influential observations, or points that when removed would cause significant change in the model. $D_i=\frac{(\hat{y}-\hat{y}_{(i)})^T(\hat{y}-\hat{y}_{(i)})}{p^*\hat{\sigma}^2}=\frac{1}{p^*}r_i^2\frac{h_i}{1-h_i}$
+We can calculate cook's distance to determine influential observations,
+or points that when removed would cause significant change in the model.
+$D_i=\frac{(\hat{y}-\hat{y}_{(i)})^T(\hat{y}-\hat{y}_{(i)})}{p^*\hat{\sigma}^2}=\frac{1}{p^*}r_i^2\frac{h_i}{1-h_i}$
 
 ```{r}
 cook1<- (r1^2/dim(X)[2])* hatv/(1-hatv)
@@ -419,13 +450,114 @@ text(cookd ~ index, labels=namesC, data=data.cook, cex=0.4, font=2, col="purple"
 abline(h=4/dim(X)[1], col="red", lty=2)
 ```
 
+If we wanted to transform our response, we could determine the most
+suitable transformation using a box-cox transformation. We could make a
+CI for lambda with the following. If it contains 1, no transformation is
+necessary.
 
+```{r}
+mod<- lm(sr ~ pop15 + pop75+ dpi+ ddpi, savings)
+par(mfrow=c(1,2), mar = c(2, 2, 0.8, 0.5))
+boxcox(lmod, plotit =TRUE);boxcox(lmod, plotit =TRUE, lambda=seq(0.5, 1.5, by=0.5))
+```
 
+We could also add polynomial terms to generalize the linear structure:
 
+$y=\beta_0+\beta_1x+\beta_2x^2+...+\beta_dx^d+\epsilon$
 
+The two common ways to pick the value for d is to keep adding terms
+until it is not statistically significant, or to start with a large d,
+and remove non-statistically significant terms:
 
+```{r}
+summary(m1<-lm(sr~ddpi, savings))$coefficients
+summary(m2<-lm(sr~ddpi + I(ddpi^2), savings))$coefficients
+summary(m3<-lm(sr~ddpi + I(ddpi^2)+ I(ddpi^3), savings))$coefficients
+```
 
+When we have $p>1$, we can use the following formula:
 
+$y=\beta_0+\sum_{i=1}\beta_jx_j+\sum_{i\leq j}a_{ij}x_ix_j+\epsilon$
+
+```{r}
+par(mar = c(3, 2, 1.5, 0.5))
+modelint<- lm(sr ~ pop15*ddpi + I(ddpi^2) + I(pop15^2), savings) #By using pop15*ddpi we add degree 1 terms
+summary(modelint)$coefficients
+
+modelint2<- lm(sr ~ pop15*ddpi, savings) #Excluding degree 2 terms
+summary(modelint2)$coefficients
+```
+
+To fit a generalized additive model
+
+```{r}
+require(mgcv); require(ggplot2); require(tidymv);library("gridExtra")
+par(mar = c(3, 2, 0.5, 0.5))
+gamod<- gam(sr ~ s(pop15) + s(pop75) + s(dpi) + s(ddpi), data=savings)
+p1<-plot_smooths(gamod, pop15); p2<-plot_smooths(gamod, pop75)
+grid.arrange(p1, p2, ncol = 2, nrow = 1)
+```
+
+We could create a generalized least squares estimate:
+
+```{r}
+data(divusa)
+require(nlme)
+gmod <- gls(divorce ~year, correlation=corAR1(form=~year),data=divusa)
+summary(gmod)
+```
+
+To study categorical data, we will use the high-school data set:
+
+```{r}
+data(hsb)
+head(hsb,10)
+summary(hsb[,-1])
+```
+
+To include two-level factors in our model, we must use dummy variables, so if we wanted to study the response of Science Score as a function of School Type (Public/Private), we define the dummy variable with respect to level Public:
+
+$$z_i=\left\{
+\begin{array}{ll}
+      1 & if \;ith \in Public\\
+      0 & if \;ith \not\in Public\\
+\end{array}
+\right.$$
+
+Thus, the linear model is: $y=\beta_0+\beta_{public}z_i+\epsilon_i$ with $\beta_{public}=\bar{y}_{public}-\bar{y}_{private}$
+
+Both methods below produce the same result:
+
+```{r}
+lmod <- lm(science~schtyp, hsb)
+summary(lmod)$coefficients
+
+lmod2 <- lm(science~as.factor(schtyp), hsb)
+summary(lmod2)$coefficients
+```
+
+If we wanted the dummy variable to be with respect to the level Private and wanted to calculate the $z_i$ values:
+
+```{r}
+private<- ifelse(hsb$schtyp=="private", 1, 0)
+lmod3 <- lm(science~private, hsb) ;summary(lmod3)$coefficients
+```
+
+If we wanted to include a quantitative variable x, we have two options. Separate regression lines for each level with the same or different slope.
+
+Same slope:
+
+```{r}
+lmod4 <- lm(science~math+schtyp, hsb) 
+summary(lmod4)$coefficients
+```
+
+Different slope:
+
+```{r}
+lmod5 <- lm(science~math+schtyp + math:schtyp , hsb) 
+summary(lmod5)$coefficients
+```
 
 
 
