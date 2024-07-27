@@ -458,7 +458,8 @@ necessary.
 ```{r}
 mod<- lm(sr ~ pop15 + pop75+ dpi+ ddpi, savings)
 par(mfrow=c(1,2), mar = c(2, 2, 0.8, 0.5))
-boxcox(lmod, plotit =TRUE);boxcox(lmod, plotit =TRUE, lambda=seq(0.5, 1.5, by=0.5))
+boxcox(lmod, plotit =TRUE)
+boxcox(lmod, plotit =TRUE, lambda=seq(0.5, 1.5, by=0.5))
 ```
 
 We could also add polynomial terms to generalize the linear structure:
@@ -515,7 +516,10 @@ head(hsb,10)
 summary(hsb[,-1])
 ```
 
-To include two-level factors in our model, we must use dummy variables, so if we wanted to study the response of Science Score as a function of School Type (Public/Private), we define the dummy variable with respect to level Public:
+To include two-level factors in our model, we must use dummy variables,
+so if we wanted to study the response of Science Score as a function of
+School Type (Public/Private), we define the dummy variable with respect
+to level Public:
 
 $$z_i=\left\{
 \begin{array}{ll}
@@ -524,7 +528,8 @@ $$z_i=\left\{
 \end{array}
 \right.$$
 
-Thus, the linear model is: $y=\beta_0+\beta_{public}z_i+\epsilon_i$ with $\beta_{public}=\bar{y}_{public}-\bar{y}_{private}$
+Thus, the linear model is: $y=\beta_0+\beta_{public}z_i+\epsilon_i$ with
+$\beta_{public}=\bar{y}_{public}-\bar{y}_{private}$
 
 Both methods below produce the same result:
 
@@ -536,14 +541,17 @@ lmod2 <- lm(science~as.factor(schtyp), hsb)
 summary(lmod2)$coefficients
 ```
 
-If we wanted the dummy variable to be with respect to the level Private and wanted to calculate the $z_i$ values:
+If we wanted the dummy variable to be with respect to the level Private
+and wanted to calculate the $z_i$ values:
 
 ```{r}
 private<- ifelse(hsb$schtyp=="private", 1, 0)
 lmod3 <- lm(science~private, hsb) ;summary(lmod3)$coefficients
 ```
 
-If we wanted to include a quantitative variable x, we have two options. Separate regression lines for each level with the same or different slope.
+If we wanted to include a quantitative variable x, we have two options.
+Separate regression lines for each level with the same or different
+slope.
 
 Same slope:
 
@@ -558,20 +566,3 @@ Different slope:
 lmod5 <- lm(science~math+schtyp + math:schtyp , hsb) 
 summary(lmod5)$coefficients
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
