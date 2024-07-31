@@ -16,6 +16,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(lmtest)
 library(MASS)
 library(faraway)
+library(leaps)
 ```
 
 First load our data
@@ -342,9 +343,9 @@ pred.CI
 predict(fit1, newdata=x0, interval="prediction")
 ```
 
-If we wanted to check Homoscedasticity of our model, i.e. plotting the
-Residuals (vertical axis) vs the fitted values $\hat{y}$ (horizontal
-axis) we would do the following:
+If we wanted to check Homoscedasticity, or see if the data has constant
+variance, of our model, i.e. plotting the Residuals (vertical axis) vs
+the fitted values $\hat{y}$ (horizontal axis) we would do the following:
 
 ```{r}
 par(mar = c(5, 5, 1, 10))
@@ -566,3 +567,95 @@ Different slope:
 lmod5 <- lm(science~math+schtyp + math:schtyp , hsb) 
 summary(lmod5)$coefficients
 ```
+
+When attempting to find the best model possible, we look to use Occam's
+Razor Principle and find a model that has a good fit with not much
+complexity. We consider two classes of schemes to drive variable
+selection:
+
+1.  Model Comparison
+2.  Regularization
+
+If we are dealing with models that are nested, one that is a subet of
+the other, we can simply use the F-test with F-statistic:
+
+$F=\frac{(SSR_{M_0}-SSR_M)/(p-q)}{SSR_{M}/(n-p)}\sim F_{(p-q,n-p)}$
+
+If $F>F_{(p-q,n-p)}$ we reject $H_0$.
+
+If we are dealing with non-nested models, we have a few criteria for comparing them. The first include the AIC and BIC(k=number of predictors):
+
+$AIC=n*log(SSR/n)+2k$
+
+$BIC=n*log(SSR/n)+k*log(n)$
+
+Small values of AIC and BIC are preferred.
+
+To see this, we will use the state data set and the regsubsets function to search through all possible combinations of predictors and find the variables for each model size k that produce the minimum SSR. By looking at rs$which, we can see which variables are used in each model size.
+
+```{r}
+data(state)
+statedata <- data.frame(state.x77, row.names=state.abb)
+models <- regsubsets(Life.Exp ~ ., statedata)
+rs <- summary(models)
+rs$which
+```
+
+To calculate both AIC and BIC we can do the following:
+
+```{r}
+n<- dim(statedata)[1]
+AIC<- n*log(rs$rss/n) + 2*seq(2,8,1)
+BIC<- n*log(rs$rss/n) + log(n)*seq(2,8,1)
+par(mar = c(2, 2, 1.5, 0.25), mfrow=c(1,2))
+plot(AIC~I(1:7), main="AIC", xlab="# Predictors", pch=20, col="blue", cex=0.7)
+plot(BIC~I(1:7), main="BIC", xlab="# Predictors", pch=20, col="blue", cex=0.7)
+```
+
+We could also use the Adjusted $R^2$ criterion $(R^2_A)$:
+
+$R^2_A=1-\frac{SSR/(n-k)}{SST/(n-1)}$
+
+This gives a value between 0 and 1, with a larger value being better.
+
+Our final criterion we can check is Mallow's $C_p$ Statistic:
+
+$C_k=SSR_k/\sigma^2_p+2k-n$
+
+We desire models with small k and with $C_k\leq k$
+
+```{r}
+par(mar = c(2, 2, 1, 0.5), mfrow=c(1,2))
+r2Ad<- rs$adjr2
+Ck<- rs$cp
+plot(r2Ad~I(1:7), main="R2 Adjusted", xlab="# Predictors", pch=20, col="red", cex=0.8)
+plot(Ck~I(1:7), main="Ck", xlab="# Predictors", pch=20, col="blue", cex=0.8)
+abline(0,1, col="red")
+```
+
+For p predictors, there are $2^p$ possible models.
+
+There are two different step-wise procedures, forward and backward, for eliminating variables to get the best possible model:
+
+```{r}
+lmod <- lm(Life.Exp~., statedata)
+stats::step(lmod)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
