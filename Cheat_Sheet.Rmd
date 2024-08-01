@@ -1,8 +1,9 @@
 ------------------------------------------------------------------------
 
 ---
-title: "Cheat Sheet (Species Example)"
+title: "Cheat Sheet"
 output:
+  pdf_document: default
   html_document:
     df_print: paged
 date: "2024-07-02"
@@ -17,6 +18,13 @@ library(lmtest)
 library(MASS)
 library(faraway)
 library(leaps)
+library(glmnet)
+library(faraway)
+library(mgcv)
+library(ggplot2)
+library(tidymv)
+library("gridExtra")
+library(nlme)
 ```
 
 First load our data
@@ -390,7 +398,6 @@ weighted distance between $X_i$ and the average point of the $X_i 's$.
 We also know that $\sum_{i=1}^nh_i=p^*=p+1$
 
 ```{r}
-library(faraway)
 data(savings)
 lmod<- lm(sr ~ pop15 + pop75+ dpi+ ddpi, savings)
 X<- model.matrix(lmod)
@@ -493,7 +500,6 @@ summary(modelint2)$coefficients
 To fit a generalized additive model
 
 ```{r}
-require(mgcv); require(ggplot2); require(tidymv);library("gridExtra")
 par(mar = c(3, 2, 0.5, 0.5))
 gamod<- gam(sr ~ s(pop15) + s(pop75) + s(dpi) + s(ddpi), data=savings)
 p1<-plot_smooths(gamod, pop15); p2<-plot_smooths(gamod, pop75)
@@ -504,7 +510,6 @@ We could create a generalized least squares estimate:
 
 ```{r}
 data(divusa)
-require(nlme)
 gmod <- gls(divorce ~year, correlation=corAR1(form=~year),data=divusa)
 summary(gmod)
 ```
@@ -583,7 +588,9 @@ $F=\frac{(SSR_{M_0}-SSR_M)/(p-q)}{SSR_{M}/(n-p)}\sim F_{(p-q,n-p)}$
 
 If $F>F_{(p-q,n-p)}$ we reject $H_0$.
 
-If we are dealing with non-nested models, we have a few criteria for comparing them. The first include the AIC and BIC(k=number of predictors):
+If we are dealing with non-nested models, we have a few criteria for
+comparing them. The first include the AIC and BIC(k=number of
+predictors):
 
 $AIC=n*log(SSR/n)+2k$
 
@@ -591,7 +598,10 @@ $BIC=n*log(SSR/n)+k*log(n)$
 
 Small values of AIC and BIC are preferred.
 
-To see this, we will use the state data set and the regsubsets function to search through all possible combinations of predictors and find the variables for each model size k that produce the minimum SSR. By looking at rs$which, we can see which variables are used in each model size.
+To see this, we will use the state data set and the regsubsets function
+to search through all possible combinations of predictors and find the
+variables for each model size k that produce the minimum SSR. By looking
+at rs\$which, we can see which variables are used in each model size.
 
 ```{r}
 data(state)
@@ -635,27 +645,58 @@ abline(0,1, col="red")
 
 For p predictors, there are $2^p$ possible models.
 
-There are two different step-wise procedures, forward and backward, for eliminating variables to get the best possible model:
+There are two different step-wise procedures, forward and backward, for
+eliminating variables to get the best possible model:
 
 ```{r}
 lmod <- lm(Life.Exp~., statedata)
 stats::step(lmod)
 ```
 
+One way to reduce extra terms in our model is Ridge Regression. This is
+useful in the presence of collinearity and if we have many p values that
+have some effect on the response. After scaling our response and
+predictors, we can perform ridge regression and choose $\beta$ that
+minimizes:
 
+$SSR+\lambda\sum_{j=1}^p\beta^2_j=(y-X\beta)^T(y-X\beta)+\lambda||\beta||^2_2$
 
+The solution for the estimates of $\beta$ can be written as:
 
+$\hat{\beta}=(X^TX+\lambda I)^{-1}X^Ty$
 
+```{r}
+par(mar = c(2, 2, 0.5, 0.5))
+seatpos
+seatpos<- scale((seatpos), center = TRUE, scale = FALSE)
+seatpos<- as.data.frame(seatpos)
+rgmod<- lm.ridge(hipcenter~., seatpos, lambda = seq(0,100, len=101))
+matplot(rgmod$lambda, coef(rgmod), type="l", xlab = "lambda", ylab = "Beta hat", cex=0.8)
+```
 
+We try to find the model with the lowest generalized cross-validation
 
+```{r}
+a<-which.min(rgmod$GCV)
+a
+coef(rgmod)[a,]
+```
 
+We could also perform Lasso Regression to shrink the terms. This form of
+regression can shrink some $\beta$ terms to exactly zero, allowing us to
+remove the corresponding predictor. We choose $\beta$ that minimizes:
 
+$SSR+\lambda \sum_{i=1}^p|\beta_j|=(y-X\beta)^T(y-x\beta)+\lambda||\beta||_1$
 
-
-
-
-
-
-
-
-
+```{r}
+data(state)
+statedata<- data.frame(state.x77, row.names =state.abb)
+y <- statedata$Life
+x <- scale(data.matrix(statedata[,-4]))
+cv_model <- cv.glmnet(x, y, alpha = 1)
+best_lambda <- cv_model$lambda.min
+best_lambda
+par(mar = c(7, 4, 2.2, 0.5));plot(cv_model, cex=0.8)
+best_model <- glmnet(x, y, alpha = 1, lambda = best_lambda)
+coef(best_model)
+```

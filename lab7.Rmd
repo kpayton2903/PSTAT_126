@@ -17,7 +17,7 @@ head(teengamb)
 ```
 
 This $teengamb$ dataset is a survey about teenage gambling in Britain. The $sex$ is $0$ for male and $1$ for female. The $status$ is socioeconomic status score based on parents' occupation, $income$ is income in pounds per week, $verbal$ is verbal score in words out of $12$ correctly difined, and $gamble$ is expenditure on gambling in pounds per year. In this dataset, $sex$ is qualitative, so we will need to transform it from integer to factor. The rest are quantitative.\
-Now we use $gamble$ as the response and the rest as predictors to fit a MLR model to the data:\
+Now we use $gamble$ as the response and the rest as predictors to fit a MLR model to the [[data:\\\\](data:\\){.uri}]([data:\\](data:\){.uri}){.uri}
 
 ```{r}
 mod=lm(gamble~factor(sex)+status+income+verbal,data=teengamb)
